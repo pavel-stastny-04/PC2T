@@ -16,4 +16,4 @@ public interface Zamestnanec {
     
 }
 
-/* Zaměstnanec skladu je své spolupracovníky ve struktuře typu HashMap (nebo něčem podobném slovníku v pythonu). Jako klíč bude pointer na zaměstnance (kolegu) a jako hodnota bude úroveň spolupráce
+/* Zaměstnanec skladu je své spolupracovníky ve struktuře typu HashMap (nebo něčem podobném slovníku v pythonu). Jako klíč bude pointer na zaměstnance (kolegu) a jako hodnota bude úroveň spolupráce*/

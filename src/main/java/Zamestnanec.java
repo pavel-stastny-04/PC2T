@@ -6,14 +6,14 @@ import java.util.Map;
  *
  * @author pavel
  */
-public abstract class Zamestnanec implements Comparable{
+public abstract class Zamestnanec implements Comparable<Zamestnanec>{
     static int noOfEmployees = 0;
-    private int ID = 0;
-    private String name = "";
-    private String surname = "";
-    private int birthYear = 0;
+    protected int ID = 0;
+    protected String name = "";
+    protected String surname = "";
+    protected int birthYear = 0;
     
-    Map<Zamestnanec, float> relations = new HashMap<Zamestnanec, float>();
+    protected Map<Zamestnanec, Float> relations = new HashMap<>();
     
     public Zamestnanec(String jmeno, String prijmeni, int narozeniny){
         ID = noOfEmployees;

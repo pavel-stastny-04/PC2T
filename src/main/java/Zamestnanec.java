@@ -8,12 +8,12 @@ import java.util.Map;
  */
 public abstract class Zamestnanec implements Comparable{
     static int noOfEmployees = 0;
-    private int ID = 0;
-    private String name = "";
-    private String surname = "";
-    private int birthYear = 0;
+    protected int ID = 0;
+    protected String name = "";
+    protected String surname = "";
+    protected int birthYear = 0;
     
-    Map<Zamestnanec, float> relations = new HashMap<Zamestnanec, float>();
+    Map<Zamestnanec, Float> relations = new HashMap();
     
     public Zamestnanec(String jmeno, String prijmeni, int narozeniny){
         ID = noOfEmployees;
@@ -24,7 +24,7 @@ public abstract class Zamestnanec implements Comparable{
     }
     
     public abstract boolean doYourJob();                                         //spustit dovednost daného zaměstnance
-    public abstract boolean deleteRelations();                                   //odstranit všechny vyzby na ostatní zaměstnance
+    public abstract boolean deleteRelations();                                   //odstranit všechny vazby na ostatní zaměstnance
     public abstract boolean addRelation(Zamestnanec coleague, float level);      //přidání spolupráce, ID druhého zaměstnance, úroveň spolupáce (náleží do <0, 1>)
     public abstract int getNumberOfRelations();                                  //vrací počet spoluprací
     public abstract float getMostUsedRelation();                                 //vrací nejčastěji používanou spolupráci

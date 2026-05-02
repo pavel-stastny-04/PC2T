@@ -14,8 +14,8 @@ import java.util.Set;
  */
 public class DataAnalytic extends Zamestnanec{  
     
-    public DataAnalytic(String jmeno, String prijmeni, int narozeniny){
-        super(jmeno, prijmeni, narozeniny);
+    public DataAnalytic(String jmeno, String prijmeni, int narozeniny, int ID){
+        super(jmeno, prijmeni, narozeniny, ID);
     }
 
     @Override
@@ -27,6 +27,9 @@ public class DataAnalytic extends Zamestnanec{
                 if (this.relations.containsKey(cz)){
                     pocetVazeb.put(z, pocetVazeb.get(z) + 1);
                 }
+                else{
+                    pocetVazeb.put(z, 1);
+                }
             }
                 
         }
@@ -34,17 +37,19 @@ public class DataAnalytic extends Zamestnanec{
         Zamestnanec bestColeague = null;
         
         for (Zamestnanec z: pocetVazeb.keySet()){               //iteruje přes všechny kolegy a hledá nevíce vazeb
-            if (pocetVazeb.get(z) > numRelations){
-                numRelations = pocetVazeb.get(z);
+            if (pocetVazeb.get(z) > numRelations){             //který kolega má s ním nejvíce vazeb, pokud více, vybere prvniho
+                System.out.println(z);
+                numRelations = pocetVazeb.get(z);               //vazby na ostatni, vcetne sebe sama
                 bestColeague = z;
             }
         }
         try{
-            System.out.println("Nejvíce společných kolegů má s: " + bestColeague.toString() + ", a to celkem " + numRelations + ".");
+            System.out.println("Nejvice spolecnych kolegu ma s: " + bestColeague.toString() + ", a to celkem " + (numRelations - 1) + ".");
             return true;
         }
         catch (NullPointerException e){
-            System.out.println(e);
+            //System.out.println(e);
+            System.out.println("" + toString() + "Nema zadne kolegy, nebo s nimi nema zadne vazby.");
             return false;
         }
     }
@@ -71,11 +76,7 @@ public class DataAnalytic extends Zamestnanec{
 
     @Override
     public int getNumberOfRelations() {
-        int count = 0;
-        for(Zamestnanec z:this.relations.keySet()){
-            count++;
-        }
-        return count;
+    	return this.relations.size();
     }
 
     @Override
@@ -128,10 +129,7 @@ public class DataAnalytic extends Zamestnanec{
 
     @Override
     public int compareTo(Zamestnanec z) {
-        if (z.getID() == this.getID()){
-            return 0;
-        }
-        return this.getID() - z.getID();
+        return this.getSurname().compareToIgnoreCase(z.getSurname());
     }
 
     @Override
@@ -141,21 +139,21 @@ public class DataAnalytic extends Zamestnanec{
 
     @Override
     public String toString() {
-        return ("Datový analytik s ID: " + Integer.toString(this.getID()) + ": " + this.getName() + " " + this.getSurname() + " nrozen " + Integer.toString(this.getBirthDate()) + ".");
+        return ("Datovy analytik s ID: " + Integer.toString(this.getID()) + ": " + this.getSurname() + this.getName() + " " + " nrozen " + Integer.toString(this.getBirthDate()) + ".");
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        return true;
+        // Pokud porovnávám objekt sám se sebou, je to shoda
+        if (this == obj) return true;
+        // Pokud je druhý objekt prázdný, není to shoda
+        if (obj == null) return false;
+        // Pokud druhý objekt není stejného typu, není to shoda
+        if (getClass() != obj.getClass()) return false;
+        
+        // Převedeme neznámý objekt na Zaměstnance a porovnáme jejich ID
+        Zamestnanec other = (Zamestnanec) obj;
+        return this.getID() == other.getID();
     }
 
     @Override

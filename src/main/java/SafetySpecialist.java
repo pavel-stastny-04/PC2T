@@ -1,5 +1,6 @@
 
 import java.util.HashMap;
+import java.util.Map;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -8,77 +9,128 @@ import java.util.HashMap;
 
 /**
  *
- * @author pavel
+ * @author baartys
  */
-public class SafetySpecialist implements Zamestnanec{  
-
+public class SafetySpecialist extends Zamestnanec{  
+	
+	public SafetySpecialist(String jmeno, String prijmeni, int narozeniny, int ID) {
+        super(jmeno, prijmeni, narozeniny, ID);
+    }
+    
+    @Override
     public boolean doYourJob() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (this.relations.isEmpty()) {
+            System.out.println("Specialista " + this.getName() + " nema zadne vazby. Riziko: 0");
+            return true; 
+        }
+        float sumLevel = 0;
+        for (Float level : this.relations.values()) {
+            sumLevel += level;
+        }
+        float avgLevel = sumLevel / this.relations.size(); 
+        float riskScore = this.relations.size() * (1.1f - avgLevel);
+        System.out.println("Specialista " + this.getName() + " vyhodnotil rizikove skore: " + riskScore);
+        
+        return true;
     }
 
+    @Override
     public boolean deleteRelations() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	this.relations.clear();
+        return true;
     }
 
+    @Override
     public boolean addRelation(Zamestnanec coleague, float level) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         this.relations.put(coleague, level);
+        return true;
     }
 
+    @Override
     public int getNumberOfRelations() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	return this.relations.size(); 
     }
 
+    @Override
     public float getMostUsedRelation() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Map<Float, Integer> vyskyty = new HashMap();
+        for (Zamestnanec z:this.relations.keySet()){
+            Float relation = this.relations.get(z);
+            if (vyskyty.containsKey(relation)){
+                vyskyty.put(relation, vyskyty.get(relation) + 1);
+            }
+            else{
+                vyskyty.put(relation, 1);
+            }
+        }
+        int count = 0;
+        float mostUsed = 0;
+        for (Float relation:vyskyty.keySet()){
+            if (vyskyty.get(relation) > count){
+                count = vyskyty.get(relation);
+                mostUsed = relation;
+            }
+        }
+        return mostUsed;
     }
 
+    @Override
     public boolean getGroup() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	return false;
     }
 
+    @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	return this.name;
     }
 
+    @Override
     public String getSurname() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	return this.surname;
     }
 
+    @Override
     public int getID() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	return this.ID;
     }
 
+    @Override
     public int getBirthDate() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	return this.birthYear;  
     }
 
+    @Override
     public int compareTo(Zamestnanec z) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return this.getSurname().compareToIgnoreCase(z.getSurname());
     }
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(this.ID)
+        return Integer.hashCode(this.ID);
     }
 
     @Override
     public String toString() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return ("Bezpecnostni specialista s ID: " + Integer.toString(this.getID()) + ": " + this.getSurname() + " " + this.getName() + " nrozen " + Integer.toString(this.getBirthDate()) + ".");
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        return true;
+        // Pokud porovnávám objekt sám se sebou, je to shoda
+        if (this == obj) return true;
+        // Pokud je druhý objekt prázdný, není to shoda
+        if (obj == null) return false;
+        // Pokud druhý objekt není stejného typu, není to shoda
+        if (getClass() != obj.getClass()) return false;
+        
+        // Převedeme neznámý objekt na Zaměstnance a porovnáme jejich ID
+        Zamestnanec other = (Zamestnanec) obj;
+        return this.getID() == other.getID();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.hashCode() - o.hashCode();
     }
     
 }

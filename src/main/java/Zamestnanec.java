@@ -1,4 +1,5 @@
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -6,17 +7,18 @@ import java.util.Map;
  *
  * @author pavel
  */
-public abstract class Zamestnanec implements Comparable<Zamestnanec>{
+public abstract class Zamestnanec implements Comparable, java.io.Serializable{
     static int noOfEmployees = 0;
     protected int ID = 0;
     protected String name = "";
     protected String surname = "";
     protected int birthYear = 0;
+    private static final long serialVersionUID = 1L;
     
-    protected Map<Zamestnanec, Float> relations = new HashMap<>();
+    Map<Zamestnanec, Float> relations = new HashMap();
     
-    public Zamestnanec(String jmeno, String prijmeni, int narozeniny){
-        ID = noOfEmployees;
+    public Zamestnanec(String jmeno, String prijmeni, int narozeniny, int ID){
+        this.ID = ID;
         noOfEmployees++;
         name = jmeno;
         surname = prijmeni;
@@ -24,7 +26,7 @@ public abstract class Zamestnanec implements Comparable<Zamestnanec>{
     }
     
     public abstract boolean doYourJob();                                         //spustit dovednost daného zaměstnance
-    public abstract boolean deleteRelations();                                   //odstranit všechny vyzby na ostatní zaměstnance
+    public abstract boolean deleteRelations();                                   //odstranit všechny vazby na ostatní zaměstnance
     public abstract boolean addRelation(Zamestnanec coleague, float level);      //přidání spolupráce, ID druhého zaměstnance, úroveň spolupáce (náleží do <0, 1>)
     public abstract int getNumberOfRelations();                                  //vrací počet spoluprací
     public abstract float getMostUsedRelation();                                 //vrací nejčastěji používanou spolupráci

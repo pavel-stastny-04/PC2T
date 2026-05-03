@@ -1,0 +1,138 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DatabaseManager {
+    // Cesta k souboru databáze (vytvoří se přímo ve složce projektu)
+    private static final String URL = "jdbc:sqlite:zamestnanci.db";
+
+    /**
+     * Vytvoří dvě tabulky: jednu pro lidi, druhou pro jejich vzájemné vazby.
+     * Zavolej tuto metodu úplně na začátku v main().
+     */
+    public static void createTables() {
+        String sqlZamestnanci = "CREATE TABLE IF NOT EXISTS zamestnanci ("
+                + "id INTEGER PRIMARY KEY,"
+                + "jmeno TEXT NOT NULL,"
+                + "prijmeni TEXT NOT NULL,"
+                + "rok_narozeni INTEGER,"
+                + "skupina INTEGER" // 1 = Datový analytik, 0 = Bezpečnostní specialista
+                + ");";
+
+        String sqlSpoluprace = "CREATE TABLE IF NOT EXISTS spoluprace ("
+                + "id_zamestnance INTEGER,"
+                + "id_kolegy INTEGER,"
+                + "uroven REAL,"
+                + "PRIMARY KEY (id_zamestnance, id_kolegy)"
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sqlZamestnanci);
+            stmt.execute(sqlSpoluprace);
+        } catch (SQLException e) {
+            System.out.println("SQL Error (Vytvareni): " + e.getMessage());
+        }
+    }
+
+    /**
+     * Bod k) Uložení všech dat do SQL databáze při ukončení programu.
+     * Tuto metodu zavolej, když uživatel vybere v menu "Konec programu".
+     */
+    public static void saveAll(Map<Integer, Zamestnanec> vsichniZamestnanci) {
+        try (Connection conn = DriverManager.getConnection(URL);
+             Statement stmt = conn.createStatement()) {
+
+            // Před uložením nové zálohy vymažeme tu starou, ať se nám to neduplikuje
+            stmt.execute("DELETE FROM zamestnanci");
+            stmt.execute("DELETE FROM spoluprace");
+
+            String insertZ = "INSERT INTO zamestnanci(id, jmeno, prijmeni, rok_narozeni, skupina) VALUES(?,?,?,?,?)";
+            String insertS = "INSERT INTO spoluprace(id_zamestnance, id_kolegy, uroven) VALUES(?,?,?)";
+
+            try (PreparedStatement pstmtZ = conn.prepareStatement(insertZ);
+                 PreparedStatement pstmtS = conn.prepareStatement(insertS)) {
+
+                // Projdeme celou HashMapu z main() a uložíme lidi
+                for (Zamestnanec z : vsichniZamestnanci.values()) {
+                    pstmtZ.setInt(1, z.getID());
+                    pstmtZ.setString(2, z.getName());
+                    pstmtZ.setString(3, z.getSurname());
+                    pstmtZ.setInt(4, z.getBirthDate());
+                    pstmtZ.setInt(5, z.getGroup() ? 1 : 0); // Prevod boolean na 1/0
+                    pstmtZ.executeUpdate();
+
+                    // Vnořený cyklus: uložíme všechny vazby tohoto zaměstnance
+                    for (Map.Entry<Zamestnanec, Float> vazba : z.relations.entrySet()) {
+                        pstmtS.setInt(1, z.getID());
+                        pstmtS.setInt(2, vazba.getKey().getID());
+                        pstmtS.setFloat(3, vazba.getValue());
+                        pstmtS.executeUpdate();
+                    }
+                }
+            }
+            System.out.println("Záloha úspěšně uložena do SQL databáze.");
+
+        } catch (SQLException e) {
+            System.out.println("SQL Error (Zaloha dat): " + e.getMessage());
+        }
+    }
+
+    /**
+     * Bod l) Načtení všech dat z SQL databáze při spuštění programu.
+     * Zavolej hned po createTables(). Vrací naplněnou HashMapu.
+     */
+    public static Map<Integer, Zamestnanec> loadAll() {
+        Map<Integer, Zamestnanec> nacteniZamestnanci = new HashMap<>();
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             Statement stmt = conn.createStatement()) {
+
+            // 1. Krok: Načtení všech zaměstnanců
+            ResultSet rsZ = stmt.executeQuery("SELECT * FROM zamestnanci");
+            while (rsZ.next()) {
+                int id = rsZ.getInt("id");
+                String jmeno = rsZ.getString("jmeno");
+                String prijmeni = rsZ.getString("prijmeni");
+                int rok = rsZ.getInt("rok_narozeni");
+                int skupina = rsZ.getInt("skupina");
+
+                // POZOR: Zde musis vytvorit spravny objekt podle toho, jak jste 
+                // s kolegou pojmenovali vase tridy (nahrad DatovyAnalytik / SafetySpecialist za vase nazvy)
+                Zamestnanec z;
+                if (skupina == 1) {
+                    z = new DatovyAnalytik(jmeno, prijmeni, rok, id); // Uprav podle svého konstruktoru
+                } else {
+                    z = new SafetySpecialist(jmeno, prijmeni, rok, id); // Uprav podle svého konstruktoru
+                }
+                nacteniZamestnanci.put(id, z);
+            }
+
+            // 2. Krok: Načtení a propojení všech vazeb
+            ResultSet rsS = stmt.executeQuery("SELECT * FROM spoluprace");
+            while (rsS.next()) {
+                int idZamestnance = rsS.getInt("id_zamestnance");
+                int idKolegy = rsS.getInt("id_kolegy");
+                float uroven = rsS.getFloat("uroven");
+
+                Zamestnanec pracovnik = nacteniZamestnanci.get(idZamestnance);
+                Zamestnanec kolega = nacteniZamestnanci.get(idKolegy);
+
+                if (pracovnik != null && kolega != null) {
+                    pracovnik.addRelation(kolega, uroven);
+                }
+            }
+            System.out.println("Data z SQL zálohy byla úspěšně načtena.");
+
+        } catch (SQLException e) {
+            System.out.println("SQL Error (Nacteni dat): " + e.getMessage());
+        }
+
+        return nacteniZamestnanci;
+    }
+}

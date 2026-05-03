@@ -89,14 +89,10 @@ public class SafetySpecialist extends Zamestnanec{
 
     @Override
     public boolean equals(Object obj) {
-        // Pokud porovnávám objekt sám se sebou, je to shoda
         if (this == obj) return true;
-        // Pokud je druhý objekt prázdný, není to shoda
         if (obj == null) return false;
-        // Pokud druhý objekt není stejného typu, není to shoda
         if (getClass() != obj.getClass()) return false;
         
-        // Převedeme neznámý objekt na Zaměstnance a porovnáme jejich ID
         Zamestnanec other = (Zamestnanec) obj;
         return this.getID() == other.getID();
     }

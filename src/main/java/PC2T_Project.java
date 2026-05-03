@@ -30,7 +30,7 @@ public class PC2T_Project {
 		catch(Exception e)
 		{
 			System.out.println("Nastala vyjimka typu "+e.toString());
-			System.out.println("zadejte prosim cele cislo ");
+			System.out.println("Zadejte prosim cele cislo ");
 			sc.nextLine();
 			cislo = pouzeCelaCisla(sc);
 		}
@@ -60,8 +60,9 @@ public class PC2T_Project {
     
     
     public static void main(String[] args) {
-        Scanner sc=new Scanner(System.in);
-		Map <Integer, Zamestnanec> mojeDatabaze = new HashMap();
+    	DatabaseManager.createTables();
+    	Scanner sc=new Scanner(System.in);
+        Map <Integer, Zamestnanec> mojeDatabaze = DatabaseManager.loadAll();
 		int volba;
 		boolean run=true;
 		while(run)
@@ -207,7 +208,7 @@ public class PC2T_Project {
                                             int pocetKolegu = mojeDatabaze.get(z).getNumberOfRelations();
                                             float spolupraceLevel = 0;
                                             if (pocetKolegu != 0){
-                                                spolupraceLevel = mojeDatabaze.get(z).getNumberOfRelations();
+                                                spolupraceLevel = mojeDatabaze.get(z).getMostUsedRelation();
                                             }
                                             if (pocetKolegu >= nejPocetKolegu){                                 //pokud jich bude více stejných, vybrat posledního
                                                 nejPocetKolegu = pocetKolegu;
@@ -220,7 +221,7 @@ public class PC2T_Project {
                                                 kvalitySpoluprace.put(spolupraceLevel, 1);
                                             }
                                         }
-                                        System.out.println("Nejvíce kolegů má " + nejZamestnanec + ", a to " + nejPocetKolegu);
+                                        System.out.println("Nejvice kolegu ma " + nejZamestnanec + ", a to " + nejPocetKolegu);
                                         
                                         int nejPocetKvality = 0;
                                         float nejKvalita = 0;
@@ -231,7 +232,7 @@ public class PC2T_Project {
                                             }
                                         }
                                         
-                                        System.out.println("Nejčastější kvalita spolupráce je " + nejKvalita + " s četností " + nejPocetKvality + ".\n\n");
+                                        System.out.println("Nejcastejsí kvalita spoluprace je " + nejKvalita + " s cetnosti " + nejPocetKvality + ".\n\n");
                                     
                                     
 					break;
@@ -300,16 +301,19 @@ public class PC2T_Project {
 					break;
 
 				case 11:
-					questionMark(); //bude obsahovat ulozeni do SQL
+					DatabaseManager.saveAll(mojeDatabaze);
 					break;
 				case 12:
-					questionMark(); //bude obsahovat nacteni z SQL
+					mojeDatabaze = DatabaseManager.loadAll();
 					break;
 				case 13:
 					run=false;
+                                        System.out.println("Ukladam data pred ukoncenim...");
+                                        DatabaseManager.saveAll(mojeDatabaze);
 					break;
                                 default:
-                                    System.out.println("Neznama operace \"" + volba + "\". Vyberte prosim polozku z nasledujici nabidky.");
+                                	
+                                    System.out.println("Neznamy prikaz \"" + volba + "\".");
                                     questionMark();
                                     break;
 			}
@@ -358,7 +362,7 @@ public class PC2T_Project {
         "        ???\n"+
         "\n"+
         "\n"+
-        "There\'s stil nothing to do and your life is to short for wasting your time..."
+        "There\'s stil nothing to do and your life is to short for wasting your time...\n\n\n"
         );
     }
 }

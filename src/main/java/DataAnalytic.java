@@ -38,13 +38,13 @@ public class DataAnalytic extends Zamestnanec{
         
         for (Zamestnanec z: pocetVazeb.keySet()){               //iteruje přes všechny kolegy a hledá nevíce vazeb
             if (pocetVazeb.get(z) > numRelations){             //který kolega má s ním nejvíce vazeb, pokud více, vybere prvniho
-                System.out.println(z);
+                //System.out.println(z);
                 numRelations = pocetVazeb.get(z);               //vazby na ostatni, vcetne sebe sama
                 bestColeague = z;
             }
         }
         try{
-            System.out.println("Nejvice spolecnych kolegu ma s: " + bestColeague.toString() + ", a to celkem " + (numRelations - 1) + ".");
+            System.out.println("Nejvice spolecnych kolegu ma s: " + bestColeague.toString() + ", a to celkem " + (numRelations) + ".");
             return true;
         }
         catch (NullPointerException e){
@@ -139,7 +139,7 @@ public class DataAnalytic extends Zamestnanec{
 
     @Override
     public String toString() {
-        return ("Datovy analytik s ID: " + Integer.toString(this.getID()) + ": " + this.getSurname() + this.getName() + " " + " nrozen " + Integer.toString(this.getBirthDate()) + ".");
+        return ("Datovy analytik s ID: " + Integer.toString(this.getID()) + ": " + this.getSurname() + this.getName() + " " + " narozen " + Integer.toString(this.getBirthDate()) + ".");
     }
 
     @Override

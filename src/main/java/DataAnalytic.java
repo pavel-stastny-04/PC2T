@@ -20,36 +20,42 @@ public class DataAnalytic extends Zamestnanec{
 
     @Override
     public boolean doYourJob() {
-        Map<Zamestnanec, Integer> pocetVazeb = new HashMap();
-        for (Zamestnanec z: this.relations.keySet()){           //iteruje přes všechny kolegy
-            pocetVazeb.put(z, 0);
-            for (Zamestnanec cz: z.relations.keySet()){         //iteruje vřes všechny spolupracovníky kolegy
-                if (this.relations.containsKey(cz)){
-                    pocetVazeb.put(z, pocetVazeb.get(z) + 1);
+        if (this.relations.isEmpty()) {
+            System.out.println(this.toString() + " nema zadne kolegy, nebo s nimi nema zadne vazby.");
+            return false;
+        }
+
+        java.util.Map<Zamestnanec, Integer> pocetVazeb = new java.util.HashMap<>();
+        
+        for (Zamestnanec z : this.relations.keySet()) {           
+            int spolecniKolegove = 0;
+            
+            for (Zamestnanec cz : z.relations.keySet()) {         
+                if (cz == this) {
+                    continue;
                 }
-                else{
-                    pocetVazeb.put(z, 1);
+                if (this.relations.containsKey(cz)) {
+                    spolecniKolegove++;
                 }
             }
-                
+            pocetVazeb.put(z, spolecniKolegove);
         }
-        int numRelations = 0;
+        
+        int maxRelations = -1;
         Zamestnanec bestColeague = null;
         
-        for (Zamestnanec z: pocetVazeb.keySet()){               //iteruje přes všechny kolegy a hledá nevíce vazeb
-            if (pocetVazeb.get(z) > numRelations){             //který kolega má s ním nejvíce vazeb, pokud více, vybere prvniho
-                System.out.println(z);
-                numRelations = pocetVazeb.get(z);               //vazby na ostatni, vcetne sebe sama
-                bestColeague = z;
+        for (java.util.Map.Entry<Zamestnanec, Integer> entry : pocetVazeb.entrySet()) { 
+            if (entry.getValue() > maxRelations) {             
+                maxRelations = entry.getValue();                
+                bestColeague = entry.getKey();
             }
         }
-        try{
-            System.out.println("Nejvice spolecnych kolegu ma s: " + bestColeague.toString() + ", a to celkem " + (numRelations - 1) + ".");
+        
+        if (bestColeague != null) {
+            System.out.println("Nejvice spolecnych kolegu ma s: " + bestColeague.toString() + ", a to celkem " + maxRelations + ".");
             return true;
-        }
-        catch (NullPointerException e){
-            //System.out.println(e);
-            System.out.println("" + toString() + "Nema zadne kolegy, nebo s nimi nema zadne vazby.");
+        } else {
+            System.out.println(this.toString() + " nema zadne kolegy, nebo s nimi nema zadne vazby.");
             return false;
         }
     }

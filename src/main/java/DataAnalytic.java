@@ -1,4 +1,3 @@
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,8 +11,8 @@ import java.util.Set;
  *
  * @author pavel
  */
-public class DataAnalytic extends Zamestnanec{  
-    
+public class DataAnalytic extends Zamestnanec {
+
     public DataAnalytic(String jmeno, String prijmeni, int narozeniny, int ID){
         super(jmeno, prijmeni, narozeniny, ID);
     }
@@ -26,11 +25,11 @@ public class DataAnalytic extends Zamestnanec{
         }
 
         java.util.Map<Zamestnanec, Integer> pocetVazeb = new java.util.HashMap<>();
-        
-        for (Zamestnanec z : this.relations.keySet()) {           
+
+        for (Zamestnanec z : this.relations.keySet()) {
             int spolecniKolegove = 0;
-            
-            for (Zamestnanec cz : z.relations.keySet()) {         
+
+            for (Zamestnanec cz : z.relations.keySet()) {
                 if (cz == this) {
                     continue;
                 }
@@ -40,17 +39,17 @@ public class DataAnalytic extends Zamestnanec{
             }
             pocetVazeb.put(z, spolecniKolegove);
         }
-        
+
         int maxRelations = -1;
         Zamestnanec bestColeague = null;
-        
-        for (java.util.Map.Entry<Zamestnanec, Integer> entry : pocetVazeb.entrySet()) { 
-            if (entry.getValue() > maxRelations) {             
-                maxRelations = entry.getValue();                
+
+        for (java.util.Map.Entry<Zamestnanec, Integer> entry : pocetVazeb.entrySet()) {
+            if (entry.getValue() > maxRelations) {
+                maxRelations = entry.getValue();
                 bestColeague = entry.getKey();
             }
         }
-        
+
         if (bestColeague != null) {
             System.out.println("Nejvice spolecnych kolegu ma s: " + bestColeague.toString() + ", a to celkem " + maxRelations + ".");
             return true;
@@ -82,7 +81,7 @@ public class DataAnalytic extends Zamestnanec{
 
     @Override
     public int getNumberOfRelations() {
-    	return this.relations.size();
+        return this.relations.size();
     }
 
     @Override
@@ -156,7 +155,7 @@ public class DataAnalytic extends Zamestnanec{
         if (obj == null) return false;
         // Pokud druhý objekt není stejného typu, není to shoda
         if (getClass() != obj.getClass()) return false;
-        
+
         // Převedeme neznámý objekt na Zaměstnance a porovnáme jejich ID
         Zamestnanec other = (Zamestnanec) obj;
         return this.getID() == other.getID();
